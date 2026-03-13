@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Mahjong Parlor 203</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Cormorant+Garamond:wght@400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --deep-red:#6b0f1a;
+  --dark:#2c1a14;
+  --gold:#c9a96a;
+  --cream:#f5efe6;
+  --paper:#fffdf9;
+  --ink:#2c2c2c;
+  --muted:#7b6d61;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  font-family:'Inter',sans-serif;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(201,169,106,.06), transparent 18%),
+    radial-gradient(circle at 80% 30%, rgba(107,15,26,.035), transparent 20%),
+    radial-gradient(circle at 30% 75%, rgba(201,169,106,.05), transparent 16%),
+    radial-gradient(circle at 75% 80%, rgba(107,15,26,.03), transparent 18%),
+    var(--cream);
+  color:var(--ink);
+}
+
+.edit-bar{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 18px;
+  background:rgba(26,10,13,.94);
+  color:#fff;
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(201,169,106,.35);
+}
+
+.edit-bar-left{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 12px;
+  border:1px solid rgba(201,169,106,.35);
+  border-radius:999px;
+  color:#f6e7c8;
+  font-size:13px;
+}
+
+.edit-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  appearance:none;
+  border:none;
+  border-radius:999px;
+  padding:11px 18px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s ease;
+}
+
+.btn-primary{background:var(--gold);color:#241610}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-secondary{background:transparent;color:#fff;border:1px solid rgba(255,255,255,.22)}
+.btn-secondary:hover{background:rgba(255,255,255,.08)}
+
+header{
+  background:
+    linear-gradient(rgba(39,13,18,.55),rgba(39,13,18,.55)),
+    radial-gradient(circle at top,#8d2130 0%, #5a0d17 42%, #2a0d12 100%);
+  color:white;
+  padding:52px 20px 40px;
+  text-align:center;
+  border-bottom:4px solid var(--gold);
+  position:relative;
+  box-shadow:inset 0 0 0 1px rgba(201,169,106,.25);
+}
+
+header::before{
+  content:"";
+  position:absolute;
+  inset:14px;
+  border:1px solid rgba(201,169,106,.55);
+  border-radius:18px;
+  pointer-events:none;
+}
+
+header::after{
+  content:"";
+  position:absolute;
+  inset:24px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:12px;
+  pointer-events:none;
+}
+}
+
+header img{
+  max-width:250px;
+  margin-bottom:14px;
+  filter:drop-shadow(0 10px 20px rgba(0,0,0,.18));
+}
+
+header h1{
+  font-family:'Cinzel Decorative',serif;
+  letter-spacing:4px;
+  margin:8px 0;
+  font-size:42px;
+}
+
+header p{
+  font-family:'Cormorant Garamond',serif;
+  font-size:24px;
+  opacity:.95;
+  margin:0;
+}
+
+nav{
+  background:#2b0b10;
+  padding:14px;
+  text-align:center;
+  border-bottom:1px solid rgba(201,169,106,.2);
+}
+
+nav a{
+  color:white;
+  margin:0 18px;
+  text-decoration:none;
+  font-weight:500;
+  letter-spacing:.5px;
+  position:relative;
+}
+
+nav a::before{
+  content:"🀄";
+  display:inline-block;
+  margin-right:8px;
+  font-size:12px;
+  opacity:.85;
+  transform:translateY(-1px);
+}
+nav a:hover{color:var(--gold)}
+
+.hero{
+  padding:120px 20px;
+  text-align:center;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,255,255,0.06), transparent 40%),
+    linear-gradient(135deg,#4a0c14 0%, #6b0f1a 40%, #2a0d12 100%);
+  position:relative;
+}
+
+.hero::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(circle at center,rgba(255,255,255,.08),transparent 30%),
+    linear-gradient(180deg,rgba(0,0,0,.08),rgba(0,0,0,.28));
+  pointer-events:none;
+}
+
+.hero-card{
+  position:relative;
+  z-index:1;
+  max-width:820px;
+  margin:0 auto;
+  background:rgba(255,253,249,.78);
+  border:1px solid rgba(201,169,106,.35);
+  border-radius:28px;
+  box-shadow:0 24px 60px rgba(79,41,21,.12);
+  padding:44px 30px;
+}
+
+.hero h1{
+  font-family:'Cinzel Decorative',serif;
+  font-size:58px;
+  margin:0 0 12px;
+  color:var(--dark);
+}
+
+.hero p{
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;
+  max-width:760px;
+  margin:0 auto;
+}
+
+section{
+  padding:84px 20px;
+  max-width:1120px;
+  margin:auto;
+  position:relative;
+}
+
+section + section::before{
+  content:"";
+  position:absolute;
+  top:0;
+  left:20px;
+  right:20px;
+  height:1px;
+  background:linear-gradient(90deg, transparent 0%, rgba(201,169,106,.22) 15%, rgba(201,169,106,.75) 50%, rgba(201,169,106,.22) 85%, transparent 100%);
+}
+
+section::after{
+  content:"🀄";
+  position:absolute;
+  right:28px;
+  bottom:22px;
+  font-size:84px;
+  opacity:.03;
+  pointer-events:none;
+  filter:grayscale(1);
+}
+
+.section-intro{
+  color:var(--muted);
+  max-width:760px;
+  line-height:1.7;
+}
+
+h2{
+  font-family:'Cinzel Decorative',serif;
+  font-size:38px;
+  margin:0 0 22px;
+  color:var(--dark);
+  border-bottom:2px solid var(--gold);
+  display:inline-block;
+  padding-bottom:10px;
+  letter-spacing:2px;
+  position:relative;
+}
+
+h2::after{
+  content:"✦";
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
+  bottom:-14px;
+  color:var(--gold);
+  font-size:14px;
+  letter-spacing:6px;
+}
+}
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:28px;
+  margin-top:28px;
+}
+
+.gallery-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+  margin-top:28px;
+}
+
+.gallery-tile{
+  position:relative;
+  overflow:hidden;
+  border-radius:22px;
+  padding:10px;
+  background:linear-gradient(180deg,#fffdf9 0%, #f3eadc 100%);
+  border:1px solid rgba(201,169,106,.42);
+  box-shadow:0 14px 34px rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.7);
+  transition:transform .3s ease, box-shadow .3s ease;
+}
+
+.gallery-tile::before{
+  content:"";
+  position:absolute;
+  inset:10px;
+  border-radius:16px;
+  border:1px solid rgba(201,169,106,.24);
+  pointer-events:none;
+}
+
+.gallery-tile:hover{
+  transform:translateY(-6px);
+  box-shadow:0 20px 42px rgba(0,0,0,.14), inset 0 1px 0 rgba(255,255,255,.75);
+}
+
+.gallery-tile img{
+  width:100%;
+  aspect-ratio:4/3;
+  object-fit:cover;
+  display:block;
+  border-radius:16px;
+  transition:transform .45s ease, filter .3s ease;
+}
+
+.gallery-tile:hover img{
+  transform:scale(1.04);
+  filter:saturate(1.03) contrast(1.02);
+}
+
+.gallery-caption{
+  position:absolute;
+  left:22px;
+  right:22px;
+  bottom:18px;
+  padding:10px 12px;
+  border-radius:14px;
+  background:rgba(34,16,12,.58);
+  color:#fff;
+  font-size:14px;
+  backdrop-filter:blur(6px);
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+
+.gallery-tile:hover .gallery-caption{
+  opacity:1;
+  transform:translateY(0);
+}
+
+.card{
+  background:var(--paper);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 14px 34px rgba(0,0,0,.08);
+  transition:.25s ease;
+  border:1px solid rgba(201,169,106,.18);
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 18px 40px rgba(0,0,0,.15);
+}
+.card h3{
+  font-family:'Cinzel Decorative',serif;
+  margin-top:0;
+  color:var(--deep-red);
+  font-size:28px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.tile-icon{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:34px;
+  height:34px;
+  border-radius:10px;
+  background:linear-gradient(180deg,#fffdf9 0%, #f3eadc 100%);
+  border:1px solid rgba(201,169,106,.45);
+  box-shadow:0 6px 14px rgba(44,26,20,.08);
+  color:var(--deep-red);
+  font-size:18px;
+  flex:0 0 34px;
+}
+.card p{line-height:1.7}
+
+.highlight{
+  background:#efe3cd;
+  border-left:5px solid var(--gold);
+  padding:18px 22px;
+  border-radius:8px;
+  margin-top:22px;
+}
+
+.two-col{
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:30px;
+  align-items:start;
+}
+
+.info-panel{
+  background:#fffaf2;
+  border:1px solid rgba(201,169,106,.28);
+  border-radius:22px;
+  padding:28px;
+  box-shadow:0 12px 28px rgba(0,0,0,.06);
+}
+
+.info-panel h3{
+  margin-top:0;
+  font-family:'Cinzel Decorative',serif;
+  color:var(--deep-red);
+}
+
+.lounge{
+  background:#f1e5d2;
+  padding:90px 20px;
+  text-align:center;
+  border-top:1px solid rgba(201,169,106,.25);
+  border-bottom:1px solid rgba(201,169,106,.25);
+}
+
+.lounge p{
+  max-width:760px;
+  margin:auto;
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px;
+  line-height:1.5;
+}
+
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:22px;
+}
+
+.contact-card{
+  background:white;
+  padding:24px;
+  border-radius:18px;
+  border:1px solid rgba(201,169,106,.2);
+  box-shadow:0 10px 24px rgba(0,0,0,.06);
+}
+
+.contact-card h3{
+  margin:0 0 10px;
+  font-family:'Cinzel Decorative',serif;
+  color:var(--deep-red);
+}
+
+footer{
+  background:#1a0a0d;
+  color:#ddd;
+  padding:40px 20px;
+  text-align:center;
+  font-size:14px;
+  margin-top:60px;
+}
+
+footer strong{color:var(--gold)}
+
+[contenteditable="true"]{
+  outline:none;
+  cursor:text;
+}
+
+[contenteditable="true"]:hover{
+  box-shadow:inset 0 0 0 1px rgba(107,15,26,.18);
+  border-radius:6px;
+}
+
+[contenteditable="true"]:focus{
+  box-shadow:0 0 0 3px rgba(201,169,106,.35);
+  background:rgba(255,255,255,.66);
+  border-radius:6px;
+}
+
+.edit-tip{
+  font-size:13px;
+  color:#f2dcc0;
+}
+
+@media (max-width:900px){
+  .two-col{grid-template-columns:1fr}
+  .hero h1{font-size:44px}
+  .hero p{font-size:24px}
+  header h1{font-size:36px}
+}
+
+@media (max-width:640px){
+  .edit-bar{flex-direction:column;align-items:flex-start}
+  nav a{display:inline-block;margin:6px 10px}
+  .hero{padding:80px 16px}
+  .hero-card{padding:30px 20px}
+  section{padding:68px 16px}
+  h2{font-size:32px}
+}
+</style>
+</head>
+<body>
+  <div class="edit-bar">
+    <div class="edit-bar-left">
+      <span class="badge">Visual Editor Mode</span>
+      <span class="edit-tip">Click almost any headline or paragraph below and type to edit it directly.</span>
+    </div>
+    <div class="edit-actions">
+      <button class="btn btn-primary" type="button" id="downloadButton">Download Edited HTML</button>
+      <button class="btn btn-secondary" type="button" id="toggleHintsButton">Toggle Edit Highlights</button>
+    </div>
+  </div>
+
+  <header>
+    <img src="logo.png" alt="Mahjong Parlor 203 Logo">
+    <h1 contenteditable="true">Mahjong Parlor 203</h1>
+    <p contenteditable="true">Mahjong – in a comfortable, classy setting</p>
+  </header>
+
+  <nav>
+    <a href="#about">About</a>
+    <a href="#lessons">Lessons</a>
+    <a href="#guided">Guided Play</a>
+    <a href="#charleston">Charleston Strategy</a>
+    <a href="#openplay">Open Play</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-card">
+      <h1 contenteditable="true">A Boutique Mahjong Lounge</h1>
+      <p contenteditable="true">Mahjong Parlor 203 offers lessons, guided play, and relaxed open play in a welcoming social setting.</p>
+    </div>
+  </section>
+
+  <section id="about">
+    <h2 contenteditable="true">The Parlor Experience</h2>
+    <p class="section-intro" contenteditable="true">Mahjong Parlor 203 is designed to feel like a refined private lounge — a place where friends gather, new players learn the game, and experienced players enjoy thoughtful competition.</p>
+    <div class="highlight" contenteditable="true">Snacks and non‑alcoholic beverages are provided at all sessions so players can relax and enjoy the game.</div>
+  </section>
+
+  <section id="lessons">
+    <div class="two-col">
+      <div>
+        <h2 contenteditable="true">🀄 Lessons</h2>
+        <p class="section-intro" contenteditable="true">Build confidence, sharpen your strategy, and learn Mahjong in a polished, encouraging environment.</p>
+      </div>
+      <div class="info-panel">
+        <h3 contenteditable="true">Lesson Format</h3>
+        <p contenteditable="true"><strong>2–3 hour sessions — $125 per person</strong></p>
+        <p contenteditable="true">Sessions can also be split into three 2‑hour classes if preferred.</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3 contenteditable="true"><span class="tile-icon">🀄</span>Mahj 101</h3>
+        <p contenteditable="true">Perfect for students brand new to Mahjong. Learn how to identify tiles and suits, read the National Mah Jongg League (NMJL) card, set up the table, and understand the flow of play.</p>
+      </div>
+      <div class="card">
+        <h3 contenteditable="true"><span class="tile-icon">🀄</span>Mahj 102</h3>
+        <p contenteditable="true">For beginners who know the basics. Students focus on rules, Charleston strategy, and building hands while learning to read the NMJL card more fluently.</p>
+        <p contenteditable="true">At least one full round of Mahjong will be completed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="guided">
+    <h2 contenteditable="true">🀄 Guided Play</h2>
+    <p class="section-intro" contenteditable="true">Play full Mahjong games with light instructor guidance. Guided play helps players practice the deal, Charleston, committing to hands, remembering rules, and learning defensive play.</p>
+    <div class="info-panel">
+      <p contenteditable="true"><strong>1–2 hour session — $50 per person.</strong></p>
+    </div>
+  </section>
+
+  <section id="charleston">
+    <h2 contenteditable="true">🀄 Charleston Strategy</h2>
+    <p class="section-intro" contenteditable="true">Take the stress out of the Charleston and learn to “play messy.” Students will create random hands and practice what to pass, what to keep, and what hands to commit to.</p>
+    <p contenteditable="true">Players will then play full games and also learn <strong>solo mahj</strong> techniques for practicing at home.</p>
+    <div class="info-panel">
+      <p contenteditable="true"><strong>1–2 hour session — $50 per person.</strong></p>
+    </div>
+  </section>
+
+  <section id="openplay">
+    <h2 contenteditable="true">🀄 Open Play</h2>
+    <p class="section-intro" contenteditable="true">Grab a seat, reserve a table, or organize multiple tables for a relaxed Mahjong gathering.</p>
+    <p contenteditable="true">An instructor will be present to answer questions and keep games moving, though strategy coaching is not provided during open play sessions.</p>
+    <div class="info-panel">
+      <p contenteditable="true"><strong>1–2 hour session — $25 per person.</strong></p>
+    </div>
+  </section>
+
+  
+
+  <section class="lounge">
+    <h2 contenteditable="true">The Mahjong Lounge</h2>
+    <p contenteditable="true">Whether you're learning your first hand or enjoying a full table with friends, Mahjong Parlor 203 offers a relaxed social atmosphere where the timeless game of Mahjong can be enjoyed in style.</p>
+  </section>
+
+  <section id="events">
+  <h2 contenteditable="true">🀄 Private Mahjong Events</h2>
+  <p class="section-intro" contenteditable="true">Mahjong Parlor 203 offers private Mahjong gatherings designed for small groups who want to learn, play, and socialize in an elegant lounge setting.</p>
+
+  <div class="cards">
+
+    <div class="card">
+      <h3 contenteditable="true">Beginner Group Lessons</h3>
+      <p contenteditable="true">Perfect for friends who want to learn Mahjong together. Groups will learn the basics of the game, how to read the NMJL card, and play guided hands in a relaxed environment.</p>
+    </div>
+
+    <div class="card">
+      <h3 contenteditable="true">Mahjong Social Nights</h3>
+      <p contenteditable="true">Reserve a table for a fun evening of Mahjong with friends. Enjoy a welcoming lounge atmosphere with light guidance available when needed.</p>
+    </div>
+
+    <div class="card">
+      <h3 contenteditable="true">Private Mahjong Parties</h3>
+      <p contenteditable="true">Celebrate birthdays, gatherings, or special occasions with a Mahjong experience designed for your group.</p>
+    </div>
+
+  </div>
+</section>
+
+<section id="contact">
+    <h2 contenteditable="true">Contact</h2>
+    <p contenteditable="true" class="section-intro">Private lessons and group play available by appointment.</p>
+    <div class="contact-grid">
+      <div class="contact-card">
+        <h3 contenteditable="true">Email</h3>
+        <p contenteditable="true">mahjongparlor203@gmail.com</p>
+      </div>
+      <div class="contact-card">
+        <h3 contenteditable="true">Phone</h3>
+        <p contenteditable="true">(203) 738-9091</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p contenteditable="true">© 2026 <strong>Mahjong Parlor 203</strong>. All rights reserved.</p>
+  </footer>
+
+  <script>
+    let showHints = true;
+
+    function toggleEditHints() {
+      showHints = !showHints;
+      const styleId = 'edit-hint-style';
+      let existing = document.getElementById(styleId);
+
+      if (!showHints) {
+        if (!existing) {
+          const style = document.createElement('style');
+          style.id = styleId;
+          style.textContent = '[contenteditable="true"]:hover,[contenteditable="true"]:focus{box-shadow:none !important;background:transparent !important;}';
+          document.head.appendChild(style);
+        }
+      } else if (existing) {
+        existing.remove();
+      }
+    }
+
+    function downloadPage() {
+      const clone = document.documentElement.cloneNode(true);
+      const bar = clone.querySelector('.edit-bar');
+      if (bar) bar.remove();
+
+      clone.querySelectorAll('script').forEach((script) => script.remove());
+      clone.querySelectorAll('[contenteditable="true"]').forEach((el) => {
+        el.removeAttribute('contenteditable');
+      });
+
+      const html = '<!DOCTYPE html>\n' + clone.outerHTML;
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'mahjong-parlor-203-edited.html';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    document.getElementById('downloadButton').addEventListener('click', downloadPage);
+    document.getElementById('toggleHintsButton').addEventListener('click', toggleEditHints);
+
+    console.assert(typeof downloadPage === 'function', 'downloadPage should be defined');
+    console.assert(typeof toggleEditHints === 'function', 'toggleEditHints should be defined');
+    console.assert(document.getElementById('downloadButton') !== null, 'download button should exist');
+    console.assert(document.getElementById('toggleHintsButton') !== null, 'toggle button should exist');
+  </script>
+</body>
+</html>
